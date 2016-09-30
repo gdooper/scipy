@@ -113,6 +113,85 @@ class TestPILUtil(TestCase):
         expected = [10, 10, 10]
         assert_equal(actual, expected)
 
+    def test_bytescale_cscale_01(self):
+        # tests behavior of a homogeneous input array with values greater
+        # than 255
+        a = np.array([300, 300, 300])
+        assert_equal(misc.bytescale(a), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=0, cmax=600), [128, 128, 128])
+        assert_equal(misc.bytescale(a, cmin=0, cmax=300), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=300, cmax=600), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmin=-300, cmax=900), [128, 128, 128])
+        for i in range(-1000, 1000):
+            assert_equal(misc.bytescale(a, cmin=i, cmax=i), [255, 255, 255])
+
+    def test_bytescale_cscale_02(self):
+        # tests behavior of a homogeneous input array with values within 0
+        # and 255
+        a = np.array([3, 3, 3])
+        assert_equal(misc.bytescale(a), [3, 3, 3])
+        assert_equal(misc.bytescale(a, cmin=0, cmax=6), [128, 128, 128])
+        assert_equal(misc.bytescale(a, cmin=0, cmax=3), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=3, cmax=6), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmin=-3, cmax=9), [128, 128, 128])
+        for i in range(-1000, 1000):
+            assert_equal(misc.bytescale(a, cmin=i, cmax=i), [3, 3, 3])
+
+    def test_bytescale_cscale_03(self):
+        # tests behavior of a homogeneous input array with values less
+        # than 255
+        a = np.array([-3, -3, -3])
+        assert_equal(misc.bytescale(a), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmin=-6, cmax=0), [128, 128, 128])
+        assert_equal(misc.bytescale(a, cmin=-3, cmax=0), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmin=-6, cmax=-3), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=-9, cmax=3), [128, 128, 128])
+        for i in range(-1000, 1000):
+            assert_equal(misc.bytescale(a, cmin=i, cmax=i), [0, 0, 0])
+
+    def test_bytescale_cscale_04(self):
+        # tests behavior of a homogeneous input array with values greater
+        # than 255, and with single cmin/cmax parameters provided
+        a = np.array([300, 300, 300])
+        assert_equal(misc.bytescale(a, cmin=200), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=300), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=400), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmax=200), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmax=300), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmax=400), [0, 0, 0])
+
+    def test_bytescale_cscale_05(self):
+        # tests behavior of a homogeneous input array with values within 0
+        # and 255, and with single cmin/cmax parameters provided
+        a = np.array([3, 3, 3])
+        assert_equal(misc.bytescale(a, cmin=2), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=3), [3, 3, 3])
+        assert_equal(misc.bytescale(a, cmin=4), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmax=2), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmax=3), [3, 3, 3])
+        assert_equal(misc.bytescale(a, cmax=4), [0, 0, 0])
+
+    def test_bytescale_cscale_06(self):
+        # tests behavior of a homogeneous input array with values less
+        # than and 255, and with single cmin/cmax parameters provided
+        a = np.array([-3, -3, -3])
+        assert_equal(misc.bytescale(a, cmin=-2), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmin=-3), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmin=-4), [255, 255, 255])
+        assert_equal(misc.bytescale(a, cmax=-2), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmax=-3), [0, 0, 0])
+        assert_equal(misc.bytescale(a, cmax=-4), [0, 0, 0])
+
+    def test_bytescale_cscale_07(self):
+        # tests behavior of a heterogeneous input array with equal cmin and
+        # cmax values
+        a = np.array([1, 2, 3])
+        assert_equal(misc.bytescale(a, cmin=0, cmax=0), [1, 2, 3])
+        assert_equal(misc.bytescale(a, cmin=1, cmax=1), [1, 2, 3])
+        assert_equal(misc.bytescale(a, cmin=2, cmax=2), [1, 2, 3])
+        assert_equal(misc.bytescale(a, cmin=3, cmax=3), [1, 2, 3])
+        assert_equal(misc.bytescale(a, cmin=4, cmax=4), [1, 2, 3])
+
     def test_imsave(self):
         picdir = os.path.join(datapath, "data")
         for png in glob.iglob(picdir + "/*.png"):

@@ -91,14 +91,14 @@ def bytescale(data, cmin=None, cmax=None, high=255, low=0):
     if cmax is None:
         cmax = data.max()
 
-    cscale = cmax - cmin
-    if cscale < 0:
-        raise ValueError("`cmax` should be larger than `cmin`.")
-    elif cscale == 0:
-        cscale = 1
+    if cmin == cmax:
+        # cmin and cmax are equal (undefined scaling), so don't scale
+        bytedata = data * 1.0
+    else:
+        # cmin and cmax are different, so scale by these params
+        scale = float(high - low) / (cmax - cmin)
+        bytedata = (data - cmin) * scale + low
 
-    scale = float(high - low) / cscale
-    bytedata = (data - cmin) * scale + low
     return (bytedata.clip(low, high) + 0.5).astype(uint8)
 
 
