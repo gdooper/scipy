@@ -60,6 +60,22 @@ class TestPILUtil(TestCase):
         im2 = misc.imresize(im, (30, 60), interp='lanczos')
         assert_equal(im2.shape, (30, 60))
 
+    def test_imresize6(self):
+        im = np.arange(50, 150).astype('float32').reshape(10, 10)
+        im2 = misc.imresize(im, (20, 20))
+        self.assertEqual(im.dtype, im2.dtype)
+        self.assertAlmostEqual(im.min(), im2.min(), 0)
+        self.assertAlmostEqual(im.mean(), im2.mean(), 0)
+        self.assertAlmostEqual(im.max(), im2.max(), 0)
+
+    def test_imresize7(self):
+        im = np.arange(50, 150).astype('uint32').reshape(10, 10)
+        im2 = misc.imresize(im, (20, 20))
+        self.assertEqual(im.dtype, im2.dtype)
+        self.assertAlmostEqual(im.min(), im2.min(), 0)
+        self.assertAlmostEqual(im.mean(), im2.mean(), 0)
+        self.assertAlmostEqual(im.max(), im2.max(), 0)
+
     def test_bytescale(self):
         x = np.array([0, 1, 2], np.uint8)
         y = np.array([0, 1, 2])

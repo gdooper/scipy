@@ -475,6 +475,8 @@ def imresize(arr, size, interp='bilinear', mode=None):
     scipy.ndimage.zoom : More generic implementation that does not use PIL.
 
     """
+    if not mode:
+        mode = 'F'
     im = toimage(arr, mode=mode)
     ts = type(size)
     if issubdtype(ts, int):
@@ -486,7 +488,7 @@ def imresize(arr, size, interp='bilinear', mode=None):
         size = (size[1], size[0])
     func = {'nearest': 0, 'lanczos': 1, 'bilinear': 2, 'bicubic': 3, 'cubic': 3}
     imnew = im.resize(size, resample=func[interp])
-    return fromimage(imnew)
+    return fromimage(imnew).astype(arr.dtype)
 
 
 def imfilter(arr, ftype):
